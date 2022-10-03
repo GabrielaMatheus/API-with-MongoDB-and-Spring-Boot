@@ -1,38 +1,38 @@
 package projeto.locadora.locadora;
 
-import static io.restassured.RestAssured.form;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 
 import io.restassured.http.ContentType;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
-import projeto.locadora.locadora.model.Carro;
 import projeto.locadora.locadora.model.Cliente;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ClienteControllerTest {
 
-    public Object pegaIdCliente(String cpf) {
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
+    private static Date createDate(String dateAsString) throws ParseException {
+        return formatter.parse(dateAsString);
+    }
+
+    public String pegaIdCliente(String cpf) {
         return given().contentType(ContentType.JSON).when().get("/clientes/" + cpf).then().extract().path("id");
     }
 
     //POST
     @Order(1)
     @Test
-    public void givenNoRequiredField_WhenPost_Then400() throws Exception {
+    public void givenNoRequiredFieldCPF_WhenPost_Then400() throws Exception {
         given()
             .body(
                 "{ \"nome\": \"nome teste\"," +
@@ -120,7 +120,7 @@ public class ClienteControllerTest {
             .body("cpf", is("123.123.123-12"))
             .body("nome", is("nome teste"))
             .body("sobrenome", is("sobrenome teste"))
-            .body("dataNascimento", is("20/09/2002"))
+            .body("dataNascimento", is("20-09-2002"))
             .body("email", is("emailteste@gmail.com"))
             .body("telefone", is("1699999-9999"));
     }
@@ -145,17 +145,18 @@ public class ClienteControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
+        Cliente cliente = new Cliente(
+            "",
+            "123.123.123-12",
+            "Nome teste",
+            "Sobrenome teste",
+            createDate("12-11-2004"),
+            "emailteste@gmail.com",
+            "1699999-9999"
+        );
+
         given()
-            .body(
-                "{\"id\":  \"" +
-                pegaIdCliente("123.123.123-12") +
-                "\", " +
-                "\"nome\": \"nome teste\"," +
-                "\"sobrenome\": \"sobrenome teste\", " +
-                "\"dataNascimento\": \"20-09-2002\"," +
-                "\"email\": \"emailteste@gmail.com\"," +
-                "\"telefone\": \"1699999-9999\"}"
-            )
+            .body(cliente)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")
@@ -168,23 +169,21 @@ public class ClienteControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    //PUT
-
     @Order(8)
     @Test
     public void givenWrongId_whenPut_then400() throws Exception {
+        Cliente cliente = new Cliente(
+            "wrongIdTest",
+            "123.123.123-12",
+            "Nome teste",
+            "Sobrenome teste",
+            createDate("12-11-2004"),
+            "emailteste@gmail.com",
+            "1699999-9999"
+        );
+
         given()
-            .body(
-                "{     \n" +
-                "    \"id\":\"wrongIdTest\",\n" +
-                "     \"cpf\": \"222.222.222-22\",\n" +
-                "            \"nome\": \"nome alterado\",\n" +
-                "            \"sobrenome\": \"sobrenome alterado\",\n" +
-                "            \"dataNascimento\": \"12-11-2004\",\n" +
-                "            \"email\": \"emailalterado@gmail.com\",\n" +
-                "            \"telefone\": \"1698888-8888\"\n" +
-                "}"
-            )
+            .body(cliente)
             .contentType(ContentType.JSON)
             .when()
             .put("/clientes")
@@ -199,20 +198,18 @@ public class ClienteControllerTest {
     @Order(9)
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
+        Cliente cliente = new Cliente(
+            pegaIdCliente("123.123.123-12"),
+            "222.222.222-22",
+            "nome alterado",
+            "sobrenome alterado",
+            createDate("12-11-2004"),
+            "emailalterado@gmail.com",
+            "1698888-8888"
+        );
+
         given()
-            .body(
-                "{     \n" +
-                "    \"id\":\"" +
-                pegaIdCliente("123.123.123-12") +
-                "\",\n" +
-                "     \"cpf\": \"222.222.222-22\",\n" +
-                "            \"nome\": \"nome alterado\",\n" +
-                "            \"sobrenome\": \"sobrenome alterado\",\n" +
-                "            \"dataNascimento\": \"12-11-2004\",\n" +
-                "            \"email\": \"emailalterado@gmail.com\",\n" +
-                "            \"telefone\": \"1698888-8888\"\n" +
-                "}"
-            )
+            .body(cliente)
             .contentType(ContentType.JSON)
             .when()
             .put("/clientes")
@@ -224,7 +221,7 @@ public class ClienteControllerTest {
             .body("cpf", is("222.222.222-22"))
             .body("nome", is("nome alterado"))
             .body("sobrenome", is("sobrenome alterado"))
-            .body("dataNascimento", is("12/11/2004"))
+            .body("dataNascimento", is("12-11-2004"))
             .body("email", is("emailalterado@gmail.com"))
             .body("telefone", is("1698888-8888"));
     }

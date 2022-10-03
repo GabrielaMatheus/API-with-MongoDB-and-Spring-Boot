@@ -10,14 +10,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
-import projeto.locadora.locadora.model.Acessorio;
 import projeto.locadora.locadora.model.Carro;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CarroControllerTest {
 
-    public Object pegaIdCarro(String placa) {
+    public String pegaIdCarro(String placa) {
         return given().contentType(ContentType.JSON).when().get("/carros/" + placa).then().extract().path("id");
     }
 
@@ -127,14 +126,18 @@ public class CarroControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
+        Carro carro = new Carro(
+            "",
+            pegaIdCarro("GGG456"),
+            "marca teste",
+            "modelo teste",
+            1996L,
+            "cor teste",
+            200000.23
+        );
+
         given()
-            .body(
-                "{\"id\":  \"" +
-                pegaIdCarro("GGG456") +
-                "\", " +
-                "\"marca\": \"marca teste nao passando o id do carro\", " +
-                "\"modelo\": \"modelo teste\"}"
-            )
+            .body(carro)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")
@@ -177,7 +180,7 @@ public class CarroControllerTest {
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
         Carro carro = new Carro(
-            (String) pegaIdCarro("GGG456"),
+            pegaIdCarro("GGG456"),
             "GGG45678",
             "marca atualizada",
             "modelo atualizado",

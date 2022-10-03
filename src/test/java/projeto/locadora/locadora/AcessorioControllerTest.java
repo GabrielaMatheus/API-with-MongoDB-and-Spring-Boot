@@ -5,12 +5,8 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 
 import io.restassured.http.ContentType;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import projeto.locadora.locadora.model.Acessorio;
@@ -19,14 +15,14 @@ import projeto.locadora.locadora.model.Acessorio;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AcessorioControllerTest {
 
-    public Object pegaIdAcessorio(String docParam) {
+    public String pegaIdAcessorio(String docParam) {
         return given().contentType(ContentType.JSON).when().get("/acessorios/" + docParam).then().extract().path("id");
     }
 
     //POST
     @Order(1)
     @org.junit.jupiter.api.Test
-    public void givenNoRequiredField_WhenPost_Then400() throws Exception {
+    public void givenNoRequiredFieldDoc_WhenPost_Then400() throws Exception {
         given()
             .body("{\"nome\":\"acessorio teste\",\"valor\":89.90}\"")
             .contentType(ContentType.JSON)
@@ -115,7 +111,7 @@ public class AcessorioControllerTest {
 
     @Order(7)
     @org.junit.jupiter.api.Test
-    public void givenNoRequiredField_WhenPut_Then400() throws Exception {
+    public void givenNoRequiredFieldDoc_WhenPut_Then400() throws Exception {
         given()
             .body(
                 "{\"id\":  \"" +
@@ -155,12 +151,7 @@ public class AcessorioControllerTest {
     @Order(9)
     @org.junit.jupiter.api.Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-        Acessorio acessorio = new Acessorio(
-            (String) pegaIdAcessorio("numDoc4987"),
-            "numDoc4987845",
-            "teste atualizado",
-            2.6
-        );
+        Acessorio acessorio = new Acessorio(pegaIdAcessorio("numDoc4987"), "numDoc4987845", "teste atualizado", 2.6);
 
         given()
             .body(acessorio)

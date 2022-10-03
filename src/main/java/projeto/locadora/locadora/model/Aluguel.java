@@ -1,5 +1,6 @@
 package projeto.locadora.locadora.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Aluguel {
     private String cpf;
 
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dataAluguel;
 
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)

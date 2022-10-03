@@ -2,16 +2,16 @@ package projeto.locadora.locadora;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasValue;
 
 import io.restassured.http.ContentType;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -20,12 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.model.Aluguel;
-import projeto.locadora.locadora.model.Carro;
 import projeto.locadora.locadora.service.AluguelService;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AluguelControllerTest {
+
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
     @Autowired
     AluguelService aluguelService;
@@ -43,17 +44,22 @@ public class AluguelControllerTest {
         return ultimoAluguel.getId();
     }
 
-    public String calculaDataAluguel(String tipoRetorno) {
-        LocalDate dataAtual = LocalDate.now().minusDays(5);
-        if (tipoRetorno == "consulta") {
-            return dataAtual.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        }
-        return dataAtual.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    public String calculaDataAluguel() throws ParseException {
+        return LocalDate.now().minusDays(5).format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
-    //POST
+    private static Date createDate(String dateAsString) throws ParseException {
+        return formatter.parse(dateAsString);
+    }
 
-    //TESTA SIMULAR ALUGUEL
+    public List<String> listaAcessorios() {
+        List<String> listaAcessorios = new ArrayList<String>();
+        listaAcessorios.add(0, "6331b4c64422f6708a0cd027");
+        listaAcessorios.add(1, "6331b4fb4422f6708a0cd028");
+        return listaAcessorios;
+    }
+
+    //SIMULAR ALUGUEL
     @Order(1)
     @Test
     public void givenNoRequiredFieldPlacaInSimular_WhenPost_Then400() throws Exception {
@@ -65,7 +71,7 @@ public class AluguelControllerTest {
                 "  ],\n" +
                 " \"cpf\": \"518.878.878-08\",\n" +
                 " \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\",\n" +
                 " \"tempoSolicitado\": 2}"
             )
@@ -93,7 +99,7 @@ public class AluguelControllerTest {
                 "],\n" +
                 " \n" +
                 " \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\",\n" +
                 " \"tempoSolicitado\": 2}"
             )
@@ -121,7 +127,7 @@ public class AluguelControllerTest {
                 "], \"cpf\": \"518.878.878-08\",\n" +
                 " \n" +
                 " \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\" }"
             )
             .contentType(ContentType.JSON)
@@ -139,20 +145,17 @@ public class AluguelControllerTest {
     @Order(4)
     @Test
     public void givenNoExistPlacaInSimular_WhenPost_Then400() throws Exception {
+        Aluguel aluguel = new Aluguel(
+            "placaErradaTeste",
+            listaAcessorios(),
+            "111.111.111-11",
+            createDate(calculaDataAluguel()),
+            null,
+            2
+        );
+
         given()
-            .body(
-                "{       \"placa_carro\": \"placaErradaTeste\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"111.111.111-11\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/simular")
@@ -168,21 +171,10 @@ public class AluguelControllerTest {
     @Test
     public void givenNoExistCPFInSimular_WhenPost_Then200() throws Exception {
         //deixa simular sem CPF.
+        Aluguel aluguel = new Aluguel("fgd9847", listaAcessorios(), "0", createDate(calculaDataAluguel()), null, 2);
 
         given()
-            .body(
-                "{       \"placa_carro\": \"fgd9847\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"0\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/simular")
@@ -197,20 +189,17 @@ public class AluguelControllerTest {
     @Order(6)
     @Test
     public void givenRequiredFieldInSimular_WhenPost_Then200() throws Exception {
+        Aluguel aluguel = new Aluguel(
+            "fgd9847",
+            listaAcessorios(),
+            "111.111.111-11",
+            createDate(calculaDataAluguel()),
+            null,
+            2
+        );
+
         given()
-            .body(
-                "{       \"placa_carro\": \"fgd9847\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"111.111.111-11\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/simular")
@@ -222,7 +211,7 @@ public class AluguelControllerTest {
             .body(is("1333.4897333333333"));
     }
 
-    //TESTA PERSISTIR
+    //PERSISTIR ALUGUEL
 
     @Order(7)
     @Test
@@ -235,7 +224,7 @@ public class AluguelControllerTest {
                 "  ],\n" +
                 " \"cpf\": \"518.878.878-08\",\n" +
                 " \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\",\n" +
                 " \"tempoSolicitado\": 2}"
             )
@@ -263,7 +252,7 @@ public class AluguelControllerTest {
                 "],\n" +
                 " \n" +
                 " \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\",\n" +
                 " \"tempoSolicitado\": 2}"
             )
@@ -291,7 +280,7 @@ public class AluguelControllerTest {
                 "            ],\n" +
                 "            \"cpf\": \"0\",\n" +
                 "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
+                calculaDataAluguel() +
                 "\"\n" +
                 "            \n" +
                 "}"
@@ -311,20 +300,17 @@ public class AluguelControllerTest {
     @Order(10)
     @Test
     public void givenNoExistPlaca_WhenPost_Then400() throws Exception {
+        Aluguel aluguel = new Aluguel(
+            "placaErradaTeste",
+            listaAcessorios(),
+            "111.111.111-11",
+            createDate(calculaDataAluguel()),
+            null,
+            2
+        );
+
         given()
-            .body(
-                "{       \"placa_carro\": \"placaErradaTeste\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"111.111.111-11\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -339,20 +325,10 @@ public class AluguelControllerTest {
     @Order(11)
     @Test
     public void givenNoExistCPF_WhenPost_Then400() throws Exception {
+        Aluguel aluguel = new Aluguel("fgd9847", listaAcessorios(), "0", createDate(calculaDataAluguel()), null, 2);
+
         given()
-            .body(
-                " {       \"placa_carro\": \"fgd9847\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"0\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -367,20 +343,17 @@ public class AluguelControllerTest {
     @Order(12)
     @Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
+        Aluguel aluguel = new Aluguel(
+            "fgd9847",
+            listaAcessorios(),
+            "111.111.111-11",
+            createDate(calculaDataAluguel()),
+            null,
+            2
+        );
+
         given()
-            .body(
-                "  {       \"placa_carro\": \"fgd9847\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"111.111.111-11\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -394,20 +367,17 @@ public class AluguelControllerTest {
     @Order(13)
     @Test
     public void givenAlreadyExistAluguel_WhenPost_Then400() throws Exception {
+        Aluguel aluguel = new Aluguel(
+            "fgd9847",
+            listaAcessorios(),
+            "111.111.111-11",
+            createDate(calculaDataAluguel()),
+            null,
+            2
+        );
+
         given()
-            .body(
-                " {       \"placa_carro\": \"fgd9847\",\n" +
-                "            \"acessorios\": [\n" +
-                "                \"6331b4c64422f6708a0cd027\",\n" +
-                "                \"6331b4fb4422f6708a0cd028\"\n" +
-                "            ],\n" +
-                "            \"cpf\": \"111.111.111-11\",\n" +
-                "            \"dataAluguel\": \"" +
-                calculaDataAluguel("") +
-                "\",\n" +
-                "            \"tempoSolicitado\": 2\n" +
-                "}"
-            )
+            .body(aluguel)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -443,7 +413,7 @@ public class AluguelControllerTest {
             .body("acessorios", everyItem(hasItem("6331b4c64422f6708a0cd027")))
             .body("acessorios", everyItem(hasItem("6331b4c64422f6708a0cd027")))
             .body("cpf", hasItem("111.111.111-11"))
-            .body("dataAluguel", hasItem(calculaDataAluguel("consulta")))
+            .body("dataAluguel", hasItem(calculaDataAluguel()))
             .body("dataDevolucao", not(hasValue(notNullValue())))
             .body("tempoSolicitado", hasItem(2));
     }
@@ -468,7 +438,7 @@ public class AluguelControllerTest {
             .body("valor", is(1333.4897F));
     }
 
-    //SIMULA DEVOLUÇÃO
+    //SIMULAR DEVOLUÇÃO
     @Order(17)
     @Test
     public void givenNoRequiredFieldPlacaCarroInSimularDevolucao_WhenPost_Then400() throws Exception {
@@ -538,6 +508,7 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
+    //PERSISTIR DEVOLUÇÃO
     @Order(21)
     @Test
     public void givenNoExistPlacaCarroInDevolucao_WhenPost_Then400() throws Exception {

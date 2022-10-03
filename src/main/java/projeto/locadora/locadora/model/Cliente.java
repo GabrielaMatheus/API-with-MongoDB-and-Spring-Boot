@@ -1,5 +1,6 @@
 package projeto.locadora.locadora.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class Cliente {
     private String sobrenome;
 
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dataNascimento;
 
     private String email;
