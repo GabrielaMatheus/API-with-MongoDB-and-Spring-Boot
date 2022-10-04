@@ -26,7 +26,11 @@ public class CarroControllerTest {
     public void givenNoRequiredField_WhenPost_Then400() throws Exception {
         given()
             .body(
-                "{\"marca\": \"marca teste\", \"modelo\": \"modelo\", \"ano\": 1231, \"cor\": \"rosa\", \"valor\": 700000.99}"
+                "{\"marca\": \"marca teste\", " +
+                "\"modelo\": \"modelo\", " +
+                "\"ano\": 1231, " +
+                "\"cor\": \"rosa\", " +
+                "\"valor\": 700000.99}"
             )
             .contentType(ContentType.JSON)
             .when()
@@ -45,7 +49,12 @@ public class CarroControllerTest {
     public void givenRequiredField_WhenPost_Then200() throws Exception {
         given()
             .body(
-                "{\"placa\":\"GGG456\",\"marca\": \"marca teste\", \"modelo\": \"modelo teste\", \"ano\": 1231, \"cor\": \"cor teste\", \"valor\": 700000.99 }"
+                "{\"placa\":\"GGG456\"," +
+                "\"marca\": \"marca teste\", " +
+                "\"modelo\": \"modelo teste\", " +
+                "\"ano\": 1231, " +
+                "\"cor\": \"cor teste\", " +
+                "\"valor\": 700000.99 }"
             )
             .contentType(ContentType.JSON)
             .when()

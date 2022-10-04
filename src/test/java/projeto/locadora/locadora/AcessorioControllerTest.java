@@ -112,12 +112,10 @@ public class AcessorioControllerTest {
     @Order(7)
     @org.junit.jupiter.api.Test
     public void givenNoRequiredFieldDoc_WhenPut_Then400() throws Exception {
+        Acessorio acessorio = new Acessorio("", pegaIdAcessorio("numDoc4987"), "teste não passando o doc", 56.00);
+
         given()
-            .body(
-                "{\"id\":  \"" +
-                pegaIdAcessorio("numDoc4987") +
-                "\", \"nome\": \"teste não passando o doc\", \"valor\":56.00}"
-            )
+            .body(acessorio)
             .contentType(ContentType.JSON)
             .when()
             .put("/acessorios")
