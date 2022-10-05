@@ -10,9 +10,10 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
+import projeto.locadora.locadora.controller.form.CarroForm;
 import projeto.locadora.locadora.model.Carro;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CarroControllerTest {
 
@@ -24,14 +25,16 @@ public class CarroControllerTest {
     @Order(1)
     @Test
     public void givenNoRequiredField_WhenPost_Then400() throws Exception {
+        CarroForm carroForm = new CarroForm();
+        carroForm.setMarca("marca teste");
+        carroForm.setModelo("modelo teste");
+        carroForm.setAno(1231);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(700000.99);
+
+
         given()
-            .body(
-                "{\"marca\": \"marca teste\", " +
-                "\"modelo\": \"modelo\", " +
-                "\"ano\": 1231, " +
-                "\"cor\": \"rosa\", " +
-                "\"valor\": 700000.99}"
-            )
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/carros")
@@ -47,15 +50,16 @@ public class CarroControllerTest {
     @Order(2)
     @Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
+        CarroForm carroForm = new CarroForm();
+        carroForm.setPlaca("GGG456");
+        carroForm.setMarca("marca teste");
+        carroForm.setModelo("modelo teste");
+        carroForm.setAno(1231);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(700000.99);
+
         given()
-            .body(
-                "{\"placa\":\"GGG456\"," +
-                "\"marca\": \"marca teste\", " +
-                "\"modelo\": \"modelo teste\", " +
-                "\"ano\": 1231, " +
-                "\"cor\": \"cor teste\", " +
-                "\"valor\": 700000.99 }"
-            )
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/carros")
@@ -69,15 +73,16 @@ public class CarroControllerTest {
     @Order(3)
     @Test
     public void givenAlreadyExistsRequiredField_WhenPost_Then400() throws Exception {
+        CarroForm carroForm = new CarroForm();
+        carroForm.setPlaca("GGG456");
+        carroForm.setMarca("marca teste");
+        carroForm.setModelo("modelo teste");
+        carroForm.setAno(1231);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(700000.99);
+
         given()
-            .body(
-                "{\"placa\":\"GGG456\"," +
-                "\"marca\": \"marca teste\"," +
-                " \"modelo\": \"modelo teste\"," +
-                " \"ano\": 1231, " +
-                "\"cor\": \"cor teste\"," +
-                " \"valor\": 700000.99 }"
-            )
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/carros")
@@ -127,7 +132,7 @@ public class CarroControllerTest {
             .all()
             .assertThat()
             .statusCode(400)
-            .body("erro", is("Carro não encontrado"));
+            .body("erro", is("Placa não encontrada"));
     }
 
     //PUT
@@ -135,18 +140,19 @@ public class CarroControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
-        Carro carro = new Carro(
-            "",
-            pegaIdCarro("GGG456"),
-            "marca teste",
-            "modelo teste",
-            1996L,
-            "cor teste",
-            200000.23
-        );
+
+        CarroForm carroForm = new CarroForm();
+        carroForm.setId("");
+        carroForm.setPlaca("GGG456");
+        carroForm.setMarca("marca teste");
+        carroForm.setModelo("modelo teste");
+        carroForm.setAno(1996L);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(200000.23);
+
 
         given()
-            .body(carro)
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")
@@ -155,25 +161,25 @@ public class CarroControllerTest {
             .all()
             .assertThat()
             .statusCode(400)
-            .body("campo", hasItems("placa"))
-            .body("erro", hasItems("não deve estar em branco"));
+            .body("erro", is("Carro não encontrado."));
+        //aqui era pra retornar que nao encontrou o id
     }
 
     @Order(8)
     @Test
     public void givenWrongId_whenPut_then400() throws Exception {
-        Carro carro = new Carro(
-            "wrongId111222333",
-            "GGG456",
-            "marca teste",
-            "modelo teste",
-            1987L,
-            "cor teste",
-            9999.99
-        );
+
+        CarroForm carroForm = new CarroForm();
+        carroForm.setId("wrongId111222333");
+        carroForm.setPlaca("GGG45678");
+        carroForm.setMarca("marca teste");
+        carroForm.setModelo("modelo teste");
+        carroForm.setAno(1996L);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(200000.23);
 
         given()
-            .body(carro)
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")
@@ -185,21 +191,23 @@ public class CarroControllerTest {
             .body("erro", is("Carro não encontrado."));
     }
 
+    //AQUI
     @Order(9)
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-        Carro carro = new Carro(
-            pegaIdCarro("GGG456"),
-            "GGG45678",
-            "marca atualizada",
-            "modelo atualizado",
-            1987L,
-            "cor atualizada",
-            38999.99
-        );
+
+        CarroForm carroForm = new CarroForm();
+        carroForm.setId(pegaIdCarro("GGG456"));
+        carroForm.setPlaca("GGG45678");
+        carroForm.setMarca("marca atualizada");
+        carroForm.setModelo("modelo atualizado");
+        carroForm.setAno(1987L);
+        carroForm.setCor("cor atualizada");
+        carroForm.setValor(38999.99);
+
 
         given()
-            .body(carro)
+            .body(carroForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")

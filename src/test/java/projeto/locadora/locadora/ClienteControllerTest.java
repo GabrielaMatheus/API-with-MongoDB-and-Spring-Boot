@@ -13,9 +13,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
+import projeto.locadora.locadora.controller.form.AluguelForm;
+import projeto.locadora.locadora.controller.form.ClienteForm;
 import projeto.locadora.locadora.model.Cliente;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ClienteControllerTest {
 
@@ -33,14 +35,15 @@ public class ClienteControllerTest {
     @Order(1)
     @Test
     public void givenNoRequiredFieldCPF_WhenPost_Then400() throws Exception {
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setNome("nome teste");
+        clienteForm.setSobrenome("sobrenome teste");
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
+        clienteForm.setDataNascimento(createDate("20-09-2002"));
+
         given()
-            .body(
-                "{ \"nome\": \"nome teste\"," +
-                "\"sobrenome\": \"sobrenome teste\", " +
-                "\"dataNascimento\": \"20-09-2002\"," +
-                "\"email\": \"emailteste@gmail.com\"," +
-                "\"telefone\": \"1699999-9999\"}"
-            )
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/clientes")
@@ -56,15 +59,16 @@ public class ClienteControllerTest {
     @Order(2)
     @Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setCpf("123.123.123-12");
+        clienteForm.setNome("nome teste");
+        clienteForm.setSobrenome("sobrenome teste");
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
+        clienteForm.setDataNascimento(createDate("20-09-2002"));
+
         given()
-            .body(
-                "{  \"cpf\": \"123.123.123-12\"," +
-                "\"nome\": \"nome teste\"," +
-                "\"sobrenome\": \"sobrenome teste\", " +
-                "\"dataNascimento\": \"20-09-2002\"," +
-                "\"email\": \"emailteste@gmail.com\"," +
-                "\"telefone\": \"1699999-9999\"}"
-            )
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/clientes")
@@ -78,15 +82,16 @@ public class ClienteControllerTest {
     @Order(3)
     @Test
     public void givenAlreadyExistsRequiredField_WhenPost_Then400() throws Exception {
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setCpf("123.123.123-12");
+        clienteForm.setNome("nome teste");
+        clienteForm.setSobrenome("sobrenome teste");
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
+        clienteForm.setDataNascimento(createDate("20-09-2002"));
+
         given()
-            .body(
-                "{  \"cpf\": \"123.123.123-12\"," +
-                "\"nome\": \"nome teste\"," +
-                "\"sobrenome\": \"sobrenome teste\", " +
-                "\"dataNascimento\": \"20-09-2002\"," +
-                "\"email\": \"emailteste@gmail.com\"," +
-                "\"telefone\": \"1699999-9999\"}"
-            )
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/clientes")
@@ -145,18 +150,18 @@ public class ClienteControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
-        Cliente cliente = new Cliente(
-            "",
-            "123.123.123-12",
-            "Nome teste",
-            "Sobrenome teste",
-            createDate("12-11-2004"),
-            "emailteste@gmail.com",
-            "1699999-9999"
-        );
+
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setId("");
+        clienteForm.setCpf("123.123.123-12");
+        clienteForm.setNome("nome alterado");
+        clienteForm.setSobrenome("sobrenome alterado");
+        clienteForm.setDataNascimento(createDate("12-11-2004"));
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
 
         given()
-            .body(cliente)
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/carros")
@@ -172,18 +177,19 @@ public class ClienteControllerTest {
     @Order(8)
     @Test
     public void givenWrongId_whenPut_then400() throws Exception {
-        Cliente cliente = new Cliente(
-            "wrongIdTest",
-            "123.123.123-12",
-            "Nome teste",
-            "Sobrenome teste",
-            createDate("12-11-2004"),
-            "emailteste@gmail.com",
-            "1699999-9999"
-        );
+
+
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setId("wrongIdTest");
+        clienteForm.setCpf("123.123.123-12");
+        clienteForm.setNome("nome alterado");
+        clienteForm.setSobrenome("sobrenome alterado");
+        clienteForm.setDataNascimento(createDate("12-11-2004"));
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
 
         given()
-            .body(cliente)
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/clientes")
@@ -198,18 +204,19 @@ public class ClienteControllerTest {
     @Order(9)
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-        Cliente cliente = new Cliente(
-            pegaIdCliente("123.123.123-12"),
-            "222.222.222-22",
-            "nome alterado",
-            "sobrenome alterado",
-            createDate("12-11-2004"),
-            "emailalterado@gmail.com",
-            "1698888-8888"
-        );
+
+
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setId(pegaIdCliente("123.123.123-12"));
+        clienteForm.setCpf("222.222.222-22");
+        clienteForm.setNome("nome alterado");
+        clienteForm.setSobrenome("sobrenome alterado");
+        clienteForm.setDataNascimento(createDate("12-11-2004"));
+        clienteForm.setEmail("emailalterado@gmail.com");
+        clienteForm.setTelefone("1698888-8888");
 
         given()
-            .body(cliente)
+            .body(clienteForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/clientes")

@@ -9,9 +9,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
+import projeto.locadora.locadora.controller.form.AcessorioForm;
 import projeto.locadora.locadora.model.Acessorio;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AcessorioControllerTest {
 
@@ -23,8 +24,12 @@ public class AcessorioControllerTest {
     @Order(1)
     @org.junit.jupiter.api.Test
     public void givenNoRequiredFieldDoc_WhenPost_Then400() throws Exception {
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setNome("acessorio teste");
+        acessorioForm.setValor(89.90);
+
         given()
-            .body("{\"nome\":\"acessorio teste\",\"valor\":89.90}\"")
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/acessorios")
@@ -40,8 +45,13 @@ public class AcessorioControllerTest {
     @Order(2)
     @org.junit.jupiter.api.Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setDoc("numDoc4987");
+        acessorioForm.setNome("acessorio teste");
+        acessorioForm.setValor(89.90);
+
         given()
-            .body("{\"nome\":\"acessorio teste\",\"doc\":\"numDoc4987\",\"valor\":89.90}\"")
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/acessorios")
@@ -55,8 +65,13 @@ public class AcessorioControllerTest {
     @Order(3)
     @org.junit.jupiter.api.Test
     public void givenAlreadyExistsRequiredField_WhenPost_Then400() throws Exception {
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setDoc("numDoc4987");
+        acessorioForm.setNome("acessorio teste");
+        acessorioForm.setValor(89.90);
+
         given()
-            .body("{\"nome\":\"acessorio teste\",\"doc\":\"numDoc4987\",\"valor\":89.90}\"")
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/acessorios")
@@ -112,10 +127,13 @@ public class AcessorioControllerTest {
     @Order(7)
     @org.junit.jupiter.api.Test
     public void givenNoRequiredFieldDoc_WhenPut_Then400() throws Exception {
-        Acessorio acessorio = new Acessorio("", pegaIdAcessorio("numDoc4987"), "teste não passando o doc", 56.00);
+
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setNome("acessorio teste");
+        acessorioForm.setValor(56.00);
 
         given()
-            .body(acessorio)
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/acessorios")
@@ -131,10 +149,14 @@ public class AcessorioControllerTest {
     @Order(8)
     @org.junit.jupiter.api.Test
     public void givenWrongId_whenPut_then400() throws Exception {
-        Acessorio acessorio = new Acessorio("wrongId111222333", "doc345", "teste", 2.6);
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setId("wrongId111222333");
+        acessorioForm.setDoc("numDoc4987");
+        acessorioForm.setNome("acessorio teste");
+        acessorioForm.setValor(89.90);
 
         given()
-            .body(acessorio)
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/acessorios")
@@ -149,10 +171,15 @@ public class AcessorioControllerTest {
     @Order(9)
     @org.junit.jupiter.api.Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-        Acessorio acessorio = new Acessorio(pegaIdAcessorio("numDoc4987"), "numDoc4987845", "teste atualizado", 2.6);
+
+        AcessorioForm acessorioForm = new AcessorioForm();
+        acessorioForm.setId(pegaIdAcessorio("numDoc4987"));
+        acessorioForm.setDoc("numDoc4987845");
+        acessorioForm.setNome("teste atualizado");
+        acessorioForm.setValor(2.6);
 
         given()
-            .body(acessorio)
+            .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
             .put("/acessorios")
