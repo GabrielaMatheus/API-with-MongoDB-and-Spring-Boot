@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.AluguelForm;
 import projeto.locadora.locadora.model.Aluguel;
+import projeto.locadora.locadora.model.AluguelValor;
 import projeto.locadora.locadora.service.AluguelService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -292,10 +293,16 @@ public class AluguelControllerTest {
     @Order(11)
     @Test
     public void givenNoExistCPF_WhenPost_Then400() throws Exception {
-        Aluguel aluguel = new Aluguel("fgd9847", listaAcessorios(), "0", createDate(calculaDataAluguel()), null, 2);
+
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("fgd9847");
+        aluguelForm.setAcessorios(listaAcessorios());
+        aluguelForm.setCpf("0");
+        aluguelForm.setDataAluguel(createDate(calculaDataAluguel()));
+        aluguelForm.setTempoSolicitado(2);
 
         given()
-            .body(aluguel)
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -310,17 +317,16 @@ public class AluguelControllerTest {
     @Order(12)
     @Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
-        Aluguel aluguel = new Aluguel(
-            "fgd9847",
-            listaAcessorios(),
-            "111.111.111-11",
-            createDate(calculaDataAluguel()),
-            null,
-            2
-        );
+
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("fgd9847");
+        aluguelForm.setAcessorios(listaAcessorios());
+        aluguelForm.setCpf("111.111.111-11");
+        aluguelForm.setDataAluguel(createDate(calculaDataAluguel()));
+        aluguelForm.setTempoSolicitado(2);
 
         given()
-            .body(aluguel)
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -334,17 +340,17 @@ public class AluguelControllerTest {
     @Order(13)
     @Test
     public void givenAlreadyExistAluguel_WhenPost_Then400() throws Exception {
-        Aluguel aluguel = new Aluguel(
-            "fgd9847",
-            listaAcessorios(),
-            "111.111.111-11",
-            createDate(calculaDataAluguel()),
-            null,
-            2
-        );
+
+
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("fgd9847");
+        aluguelForm.setAcessorios(listaAcessorios());
+        aluguelForm.setCpf("111.111.111-11");
+        aluguelForm.setDataAluguel(createDate(calculaDataAluguel()));
+        aluguelForm.setTempoSolicitado(2);
 
         given()
-            .body(aluguel)
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis")
@@ -426,8 +432,11 @@ public class AluguelControllerTest {
     @Order(18)
     @Test
     public void givenNoExistPlacaCarroInSimularDevolucao_WhenPost_Then400() throws Exception {
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("placaErradaTeste");
+
         given()
-            .body("{   \"placa_carro\": \"placaErradaTeste\"}")
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/simularDevolucao")
@@ -442,8 +451,11 @@ public class AluguelControllerTest {
     @Order(19)
     @Test
     public void givenPlacaCarroInSimularDevolucao_WhenPost_Then200() throws Exception {
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("fgd9847");
+
         given()
-            .body("{   \"placa_carro\": \"fgd9847\"}")
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/simularDevolucao")
@@ -479,8 +491,11 @@ public class AluguelControllerTest {
     @Order(21)
     @Test
     public void givenNoExistPlacaCarroInDevolucao_WhenPost_Then400() throws Exception {
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("placaErradaTeste");
+
         given()
-            .body("{   \"placa_carro\": \"placaErradaTeste\"}")
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/devolucao")
@@ -495,8 +510,11 @@ public class AluguelControllerTest {
     @Order(22)
     @Test
     public void givenPlacaCarro_WhenPost_Then200() throws Exception {
+        AluguelForm aluguelForm = new AluguelForm();
+        aluguelForm.setPlaca_carro("fgd9847");
+
         given()
-            .body("{   \"placa_carro\": \"fgd9847\"}")
+            .body(aluguelForm)
             .contentType(ContentType.JSON)
             .when()
             .post("/alugueis/devolucao")
