@@ -18,15 +18,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.AluguelForm;
 import projeto.locadora.locadora.model.Aluguel;
 import projeto.locadora.locadora.model.AluguelValor;
 import projeto.locadora.locadora.service.AluguelService;
 
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AluguelControllerTest {
+
+    @Container
+    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
+            .withExposedPorts(6379);
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 

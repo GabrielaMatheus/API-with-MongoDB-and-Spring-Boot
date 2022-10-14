@@ -20,12 +20,11 @@ public class Aluguel {
     private List<String> acessorios;
 
     private String cpf;
-
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dataAluguel;
-
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dataDevolucao;
 
     private Integer tempoSolicitado;

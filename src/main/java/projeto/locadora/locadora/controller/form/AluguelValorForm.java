@@ -20,12 +20,10 @@ public class AluguelValorForm {
     @NotNull
     private Double valor;
 
-    //private String placa_carro;
 
     public AluguelValorForm(String idAluguel, Double valor) {
         this.idAluguel = idAluguel;
         this.valor = valor;
-        //  this.placa_carro = placa_carro;
     }
 
     public static AluguelValor updateValor(

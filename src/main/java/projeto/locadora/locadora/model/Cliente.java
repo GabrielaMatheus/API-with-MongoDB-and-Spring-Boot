@@ -19,7 +19,6 @@ public class Cliente {
     private String nome;
 
     private String sobrenome;
-
     @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dataNascimento;
