@@ -1,11 +1,15 @@
 package projeto.locadora.locadora.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
+@AllArgsConstructor //construtor com argumentos
+@NoArgsConstructor //construtor sem argumentos
 public class Acessorio {
 
     @Id
@@ -14,13 +18,4 @@ public class Acessorio {
     private String doc;
     private String nome;
     private Double valor;
-
-    public Acessorio(String id, String doc, String nome, Double valor) {
-        this.doc = doc;
-        this.id = id;
-        this.nome = nome;
-        this.valor = valor;
-    }
-
-    public Acessorio() {}
 }

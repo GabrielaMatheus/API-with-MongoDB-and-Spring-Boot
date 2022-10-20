@@ -16,26 +16,27 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.AluguelForm;
+import projeto.locadora.locadora.controller.form.CarroForm;
+import projeto.locadora.locadora.controller.form.ClienteForm;
 import projeto.locadora.locadora.model.Aluguel;
 import projeto.locadora.locadora.model.AluguelValor;
 import projeto.locadora.locadora.service.AluguelService;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(MongoDBConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
 public class AluguelControllerTest {
-
-    @Container
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(6379);
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -70,12 +71,58 @@ public class AluguelControllerTest {
         return listaAcessorios;
     }
 
-    //SIMULAR ALUGUEL
+    //CADASTRA CARRO QUE SERÁ ALUGADO
     @Order(1)
     @Test
+    public void giverCarro_WhenPost_Then200() throws Exception {
+        CarroForm carroForm = new CarroForm();
+        carroForm.setPlaca("fgd9847");
+        carroForm.setMarca("honda");
+        carroForm.setModelo("civic");
+        carroForm.setAno(2021);
+        carroForm.setCor("cor teste");
+        carroForm.setValor(200000.00);
+
+        given()
+            .body(carroForm)
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/carros")
+            .then()
+            .log()
+            .all()
+            .assertThat()
+            .statusCode(200);
+    }
+
+    //CADASTRA CARRO QUE SERÁ ALUGADO
+    @Order(2)
+    @Test
+    public void giverCliente_WhenPost_Then200() throws Exception {
+        ClienteForm clienteForm = new ClienteForm();
+        clienteForm.setCpf("111.111.111-11");
+        clienteForm.setNome("nome teste");
+        clienteForm.setSobrenome("sobrenome teste");
+        clienteForm.setEmail("emailteste@gmail.com");
+        clienteForm.setTelefone("1699999-9999");
+        clienteForm.setDataNascimento(createDate("20-09-2002"));
+
+        given()
+            .body(clienteForm)
+            .contentType(ContentType.JSON)
+            .when()
+            .post("/clientes")
+            .then()
+            .log()
+            .all()
+            .assertThat()
+            .statusCode(200);
+    }
+
+    //SIMULAR ALUGUEL
+    @Order(3)
+    @Test
     public void givenNoRequiredFieldPlacaInSimular_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -96,18 +143,14 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    @Order(2)
+    @Order(4)
     @Test
     public void givenNoRequiredFieldCPFInSimular_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
         aluguelForm.setDataAluguel(createDate(calculaDataAluguel()));
         aluguelForm.setTempoSolicitado(2);
-
-
 
         given()
             .body(aluguelForm)
@@ -123,11 +166,9 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    @Order(3)
+    @Order(5)
     @Test
     public void givenNoRequiredFieldTempoSolicitadoInSimular_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -147,11 +188,9 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve ser nulo"));
     }
 
-    @Order(4)
+    @Order(6)
     @Test
     public void givenNoExistPlacaInSimular_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("placaErradaTeste");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -172,9 +211,9 @@ public class AluguelControllerTest {
             .body("erro", is("Carro não encontrado"));
     }
 
-    @Order(5)
+    @Order(7)
     @Test
-    public void givenNoExistCPFInSimular_WhenPost_Then200() throws Exception {
+    public void givenRightDataInSimular_WhenPost_Then200() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -192,18 +231,14 @@ public class AluguelControllerTest {
             .all()
             .assertThat()
             .statusCode(200)
-            .body(is("1333.4897333333333"));
+            .body(is("1333.3333333333335"));
     }
-
-
 
     //PERSISTIR ALUGUEL
 
-    @Order(7)
+    @Order(8)
     @Test
     public void givenNoRequiredFieldPlaca_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -225,10 +260,9 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    @Order(8)
+    @Order(9)
     @Test
     public void givenNoRequiredFieldCPF_WhenPost_Then400() throws Exception {
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -250,10 +284,9 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    @Order(9)
+    @Order(10)
     @Test
     public void givenNoRequiredFieldTempoSolicitado_WhenPost_Then400() throws Exception {
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -274,11 +307,9 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve ser nulo"));
     }
 
-    @Order(10)
+    @Order(11)
     @Test
     public void givenNoExistPlaca_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("placaErradaTeste");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -299,10 +330,9 @@ public class AluguelControllerTest {
             .body("erro", is("Carro não encontrado."));
     }
 
-    @Order(11)
+    @Order(12)
     @Test
     public void givenNoExistCPF_WhenPost_Then400() throws Exception {
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -323,10 +353,9 @@ public class AluguelControllerTest {
             .body("erro", is("Cliente não encontrado."));
     }
 
-    @Order(12)
+    @Order(13)
     @Test
     public void givenRequiredField_WhenPost_Then200() throws Exception {
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -346,11 +375,9 @@ public class AluguelControllerTest {
             .statusCode(200);
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     public void givenAlreadyExistAluguel_WhenPost_Then400() throws Exception {
-
-
         AluguelForm aluguelForm = new AluguelForm();
         aluguelForm.setPlaca_carro("fgd9847");
         aluguelForm.setAcessorios(listaAcessorios());
@@ -373,13 +400,13 @@ public class AluguelControllerTest {
 
     //GET
 
-    @Order(14)
+    @Order(15)
     @org.junit.jupiter.api.Test
     public void whenGet_Then200() throws Exception {
         given().when().get("/alugueis").then().assertThat().statusCode(200).and().log().all();
     }
 
-    @Order(15)
+    @Order(16)
     @org.junit.jupiter.api.Test
     public void givenUniquePlaca_whenGet_Then200() throws Exception {
         given()
@@ -402,7 +429,7 @@ public class AluguelControllerTest {
 
     //VERIFICA SE SALVOU NO ALUGUEL VALORES
 
-    @Order(16)
+    @Order(17)
     @org.junit.jupiter.api.Test
     public void givenUniqueIdInAluguelValores_whenGet_Then200() throws Exception {
         String idAluguel = pegaIdAluguel("fgd9847");
@@ -417,11 +444,11 @@ public class AluguelControllerTest {
             .assertThat()
             .statusCode(200)
             .body("idAluguel", is(idAluguel))
-            .body("valor", is(1333.4897F));
+            .body("valor", is(1333.3334F));
     }
 
     //SIMULAR DEVOLUÇÃO
-    @Order(17)
+    @Order(18)
     @Test
     public void givenNoRequiredFieldPlacaCarroInSimularDevolucao_WhenPost_Then400() throws Exception {
         given()
@@ -438,7 +465,7 @@ public class AluguelControllerTest {
             .body("erro", hasItems("não deve estar em branco"));
     }
 
-    @Order(18)
+    @Order(19)
     @Test
     public void givenNoExistPlacaCarroInSimularDevolucao_WhenPost_Then400() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
@@ -457,7 +484,7 @@ public class AluguelControllerTest {
             .body("erro", is("Aluguel não encontrado"));
     }
 
-    @Order(19)
+    @Order(20)
     @Test
     public void givenPlacaCarroInSimularDevolucao_WhenPost_Then200() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
@@ -473,13 +500,13 @@ public class AluguelControllerTest {
             .all()
             .assertThat()
             .statusCode(200)
-            .body("valorTotal", is("1426,83"))
-            .body("valor", is("1333,49"))
-            .body("valorMulta", is("93,34"));
+            .body("valorTotal", is("1426,67"))
+            .body("valor", is("1333,33"))
+            .body("valorMulta", is("93,33"));
     }
 
     //PERSISTIR DEVOLUÇÃO
-    @Order(20)
+    @Order(21)
     @Test
     public void givenNoRequiredFieldPlacaCarro_WhenPost_Then400() throws Exception {
         given()
@@ -497,7 +524,7 @@ public class AluguelControllerTest {
     }
 
     //PERSISTIR DEVOLUÇÃO
-    @Order(21)
+    @Order(22)
     @Test
     public void givenNoExistPlacaCarroInDevolucao_WhenPost_Then400() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
@@ -516,7 +543,7 @@ public class AluguelControllerTest {
             .body("erro", is("Aluguel não encontrado"));
     }
 
-    @Order(22)
+    @Order(23)
     @Test
     public void givenPlacaCarro_WhenPost_Then200() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
@@ -534,7 +561,7 @@ public class AluguelControllerTest {
             .statusCode(200);
     }
 
-    @Order(23)
+    @Order(24)
     @Test
     public void givenPlacaCarroAlreadyReturned_WhenPost_Then400() throws Exception {
         AluguelForm aluguelForm = new AluguelForm();
@@ -555,7 +582,7 @@ public class AluguelControllerTest {
 
     //VERIFICA SE SALVOU NO ALUGUEL VALORES
 
-    @Order(24)
+    @Order(25)
     @org.junit.jupiter.api.Test
     public void givenUniqueIdInAluguelValores_whenGetDevolucao_Then200() throws Exception {
         String idAluguel = pegaIdAluguel("fgd9847");
@@ -570,11 +597,11 @@ public class AluguelControllerTest {
             .assertThat()
             .statusCode(200)
             .body("idAluguel", is(idAluguel))
-            .body("valor", is(1426.834F));
+            .body("valor", is(1426.6666F));
     }
 
     //DELETE
-    @Order(25)
+    @Order(26)
     @org.junit.jupiter.api.Test
     public void givenId_whenDelete_Then200() throws Exception {
         String idAluguel = pegaIdAluguel("fgd9847");
@@ -590,7 +617,7 @@ public class AluguelControllerTest {
             .statusCode(200);
     }
 
-    @Order(26)
+    @Order(27)
     @org.junit.jupiter.api.Test
     public void givenUniquePlaca_whenGet_Then200_AndBodyEmpty() {
         given()

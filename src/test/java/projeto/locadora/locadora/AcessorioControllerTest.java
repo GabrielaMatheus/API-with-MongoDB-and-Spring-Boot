@@ -5,27 +5,19 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.annotation.DirtiesContext;
 import projeto.locadora.locadora.controller.form.AcessorioForm;
-import projeto.locadora.locadora.model.Acessorio;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(MongoDBConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext //diz que as configurações de test estão em outra classe
 public class AcessorioControllerTest {
-
-
-    @Container
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(6379);
 
     public String pegaIdAcessorio(String docParam) {
         return given().contentType(ContentType.JSON).when().get("/acessorios/" + docParam).then().extract().path("id");
@@ -138,7 +130,6 @@ public class AcessorioControllerTest {
     @Order(7)
     @org.junit.jupiter.api.Test
     public void givenNoRequiredFieldDoc_WhenPut_Then400() throws Exception {
-
         AcessorioForm acessorioForm = new AcessorioForm();
         acessorioForm.setNome("acessorio teste");
         acessorioForm.setValor(56.00);
@@ -182,7 +173,6 @@ public class AcessorioControllerTest {
     @Order(9)
     @org.junit.jupiter.api.Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-
         AcessorioForm acessorioForm = new AcessorioForm();
         acessorioForm.setId(pegaIdAcessorio("numDoc4987"));
         acessorioForm.setDoc("numDoc4987845");

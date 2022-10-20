@@ -20,7 +20,6 @@ public class AluguelValorForm {
     @NotNull
     private Double valor;
 
-
     public AluguelValorForm(String idAluguel, Double valor) {
         this.idAluguel = idAluguel;
         this.valor = valor;

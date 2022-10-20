@@ -12,7 +12,9 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,14 +23,11 @@ import projeto.locadora.locadora.controller.form.AluguelForm;
 import projeto.locadora.locadora.controller.form.ClienteForm;
 import projeto.locadora.locadora.model.Cliente;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(MongoDBConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
 public class ClienteControllerTest {
-
-    @Container
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(6379);
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -159,7 +158,6 @@ public class ClienteControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
-
         ClienteForm clienteForm = new ClienteForm();
         clienteForm.setId("");
         clienteForm.setCpf("123.123.123-12");
@@ -186,8 +184,6 @@ public class ClienteControllerTest {
     @Order(8)
     @Test
     public void givenWrongId_whenPut_then400() throws Exception {
-
-
         ClienteForm clienteForm = new ClienteForm();
         clienteForm.setId("wrongIdTest");
         clienteForm.setCpf("123.123.123-12");
@@ -213,8 +209,6 @@ public class ClienteControllerTest {
     @Order(9)
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-
-
         ClienteForm clienteForm = new ClienteForm();
         clienteForm.setId(pegaIdCliente("123.123.123-12"));
         clienteForm.setCpf("222.222.222-22");

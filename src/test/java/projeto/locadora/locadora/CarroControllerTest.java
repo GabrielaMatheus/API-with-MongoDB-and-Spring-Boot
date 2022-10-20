@@ -9,21 +9,21 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import projeto.locadora.locadora.controller.form.CarroForm;
 import projeto.locadora.locadora.model.Carro;
-@Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CarroControllerTest {
 
-    @Container
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(6379);
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith(MongoDBConfig.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+public class CarroControllerTest {
 
     public String pegaIdCarro(String placa) {
         return given().contentType(ContentType.JSON).when().get("/carros/" + placa).then().extract().path("id");
@@ -39,7 +39,6 @@ public class CarroControllerTest {
         carroForm.setAno(1231);
         carroForm.setCor("cor teste");
         carroForm.setValor(700000.99);
-
 
         given()
             .body(carroForm)
@@ -148,7 +147,6 @@ public class CarroControllerTest {
     @Order(7)
     @Test
     public void givenNoRequiredField_WhenPut_Then400() throws Exception {
-
         CarroForm carroForm = new CarroForm();
         carroForm.setId("");
         carroForm.setPlaca("GGG456");
@@ -157,7 +155,6 @@ public class CarroControllerTest {
         carroForm.setAno(1996L);
         carroForm.setCor("cor teste");
         carroForm.setValor(200000.23);
-
 
         given()
             .body(carroForm)
@@ -176,7 +173,6 @@ public class CarroControllerTest {
     @Order(8)
     @Test
     public void givenWrongId_whenPut_then400() throws Exception {
-
         CarroForm carroForm = new CarroForm();
         carroForm.setId("wrongId111222333");
         carroForm.setPlaca("GGG45678");
@@ -203,7 +199,6 @@ public class CarroControllerTest {
     @Order(9)
     @Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
-
         CarroForm carroForm = new CarroForm();
         carroForm.setId(pegaIdCarro("GGG456"));
         carroForm.setPlaca("GGG45678");
@@ -212,7 +207,6 @@ public class CarroControllerTest {
         carroForm.setAno(1987L);
         carroForm.setCor("cor atualizada");
         carroForm.setValor(38999.99);
-
 
         given()
             .body(carroForm)

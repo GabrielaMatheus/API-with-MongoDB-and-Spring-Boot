@@ -27,7 +27,7 @@ public class ClienteService {
         return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
     }
 
-    public void persistir( ClienteForm form) throws NotFoundException {
+    public void persistir(ClienteForm form) throws NotFoundException {
         Optional<Cliente> cliente = clienteRepository.findByCpf(form.getCpf());
         if (cliente.isPresent()) {
             throw new NotFoundException("CPF já cadastrado.");
@@ -35,7 +35,7 @@ public class ClienteService {
         clienteRepository.save(ClienteMapper.INSTANCE.clienteFormToCliente(form));
     }
 
-    public void atualizar( ClienteForm form) throws NotFoundException {
+    public void atualizar(ClienteForm form) throws NotFoundException {
         clienteRepository.findById(form.getId()).orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
         clienteRepository.save(ClienteMapper.INSTANCE.clienteFormToCliente(form));
     }
