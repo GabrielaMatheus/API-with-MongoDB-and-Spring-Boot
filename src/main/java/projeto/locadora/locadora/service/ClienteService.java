@@ -23,8 +23,8 @@ public class ClienteService {
         return clienteRepository.findAll(paginacao);
     }
 
-    public Cliente listarUm(String cpf) throws NotFoundException {
-        return clienteRepository.findByCpf(cpf).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
+    public Cliente listarUm(String id) throws NotFoundException {
+        return clienteRepository.findById(id).orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
     }
 
     public void persistir(ClienteForm form) throws NotFoundException {
@@ -35,9 +35,19 @@ public class ClienteService {
         clienteRepository.save(ClienteMapper.INSTANCE.clienteFormToCliente(form));
     }
 
-    public void atualizar(ClienteForm form) throws NotFoundException {
-        clienteRepository.findById(form.getId()).orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
-        clienteRepository.save(ClienteMapper.INSTANCE.clienteFormToCliente(form));
+    public void atualizar(ClienteForm form, String id) throws NotFoundException {
+        Cliente cliente = clienteRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
+
+        cliente.setCpf(form.getCpf());
+        cliente.setNome(form.getNome());
+        cliente.setEmail(form.getEmail());
+        cliente.setSobrenome(form.getSobrenome());
+        cliente.setTelefone(form.getTelefone());
+        cliente.setDataNascimento(form.getDataNascimento());
+
+        clienteRepository.save(cliente);
     }
 
     public void remover(String id) throws NotFoundException {

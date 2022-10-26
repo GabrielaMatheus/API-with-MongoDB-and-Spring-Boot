@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.CarroForm;
 import projeto.locadora.locadora.controller.form.mappers.CarroMapper;
@@ -23,8 +24,8 @@ public class CarroService {
         return carros;
     }
 
-    public Carro listarUm(String placa) throws NotFoundException {
-        return carroRepository.findByPlaca(placa).orElseThrow(() -> new NotFoundException("Placa não encontrada"));
+    public Carro listarUm(String id) throws NotFoundException {
+        return carroRepository.findById(id).orElseThrow(() -> new NotFoundException("Placa não encontrada"));
     }
 
     public void persistir(CarroForm form) throws NotFoundException {
@@ -35,9 +36,17 @@ public class CarroService {
         carroRepository.save(CarroMapper.INSTANCE.carroFormToCarro(form));
     }
 
-    public void atualizar(CarroForm form) throws NotFoundException {
-        carroRepository.findById(form.getId()).orElseThrow(() -> new NotFoundException("Carro não encontrado."));
-        carroRepository.save(CarroMapper.INSTANCE.carroFormToCarro(form));
+    public void atualizar(CarroForm form, String id) throws NotFoundException {
+        Carro carro = carroRepository.findById(id).orElseThrow(() -> new NotFoundException("Carro não encontrado."));
+
+        carro.setAno(form.getAno());
+        carro.setCor(form.getCor());
+        carro.setPlaca(form.getPlaca());
+        carro.setMarca(form.getMarca());
+        carro.setModelo(form.getModelo());
+        carro.setValor(form.getValor());
+
+        carroRepository.save(carro);
     }
 
     public void remover(String id) throws NotFoundException {

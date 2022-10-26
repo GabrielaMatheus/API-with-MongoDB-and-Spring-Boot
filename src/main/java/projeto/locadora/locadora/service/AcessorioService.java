@@ -21,8 +21,8 @@ public class AcessorioService {
         return acessorioRepository.findAll(paginacao);
     }
 
-    public Acessorio listarUm(String doc) throws NotFoundException {
-        return acessorioRepository.findByDoc(doc).orElseThrow(() -> new NotFoundException("Acessório não encontrado"));
+    public Acessorio listarUm(String id) throws NotFoundException {
+        return acessorioRepository.findById(id).orElseThrow(() -> new NotFoundException("Acessório não encontrado"));
     }
 
     public void persistir(AcessorioForm form) throws NotFoundException {
@@ -33,11 +33,16 @@ public class AcessorioService {
         acessorioRepository.save(AcessorioMapper.INSTANCE.acessorioFormToAcessorio(form));
     }
 
-    public void atualizar(AcessorioForm form) throws NotFoundException {
-        acessorioRepository
-            .findById(form.getId())
+    public void atualizar(AcessorioForm form, String id) throws NotFoundException {
+        Acessorio acessorio = acessorioRepository
+            .findById(id)
             .orElseThrow(() -> new NotFoundException("Acessório não encontrado."));
-        acessorioRepository.save(AcessorioMapper.INSTANCE.acessorioFormToAcessorio(form));
+
+        acessorio.setDoc(form.getDoc());
+        acessorio.setValor(form.getValor());
+        acessorio.setNome(form.getNome());
+
+        acessorioRepository.save(acessorio);
     }
 
     public void remover(String id) throws NotFoundException {

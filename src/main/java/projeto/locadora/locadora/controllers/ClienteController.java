@@ -43,10 +43,10 @@ public class ClienteController {
         clienteService.persistir(form);
     }
 
-    @PutMapping
-    public Cliente atualizar(@RequestBody @Valid ClienteForm form) throws NotFoundException {
-        clienteService.atualizar(form);
-        return listarUm(form.getCpf());
+    @PutMapping("/{id}")
+    public Cliente atualizar(@RequestBody @Valid ClienteForm form, @PathVariable String id) throws NotFoundException {
+        clienteService.atualizar(form, id);
+        return listarUm(id);
     }
 
     @DeleteMapping("/{id}")

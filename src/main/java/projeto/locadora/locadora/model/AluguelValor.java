@@ -1,11 +1,15 @@
 package projeto.locadora.locadora.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AluguelValor {
 
     @Id
@@ -14,12 +18,4 @@ public class AluguelValor {
     private String idAluguel;
 
     private Double valor;
-
-    public AluguelValor(String idAluguel, Double valor) {
-        super();
-        this.idAluguel = idAluguel;
-        this.valor = valor;
-    }
-
-    public AluguelValor() {}
 }

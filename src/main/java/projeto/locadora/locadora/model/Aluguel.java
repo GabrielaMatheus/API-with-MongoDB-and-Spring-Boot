@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Aluguel {
 
     @Id
@@ -30,23 +34,4 @@ public class Aluguel {
     private Date dataDevolucao;
 
     private Integer tempoSolicitado;
-
-    public Aluguel(
-        String placa_carro,
-        List<String> acessorios,
-        String cpf,
-        Date dataAluguel,
-        Date dataDevolucao,
-        Integer tempoSolicitado
-    ) {
-        super();
-        this.placa_carro = placa_carro;
-        this.acessorios = acessorios;
-        this.cpf = cpf;
-        this.dataAluguel = dataAluguel;
-        this.dataDevolucao = dataDevolucao;
-        this.tempoSolicitado = tempoSolicitado;
-    }
-
-    public Aluguel() {}
 }

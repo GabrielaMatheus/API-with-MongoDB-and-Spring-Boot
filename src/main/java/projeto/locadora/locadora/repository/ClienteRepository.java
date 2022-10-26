@@ -9,5 +9,6 @@ import projeto.locadora.locadora.model.Cliente;
 public interface ClienteRepository extends MongoRepository<Cliente, String> {
     Cliente getReferenceById(String id);
 
+    Optional<Cliente> findById(String id);
     Optional<Cliente> findByCpf(String cpf);
 }

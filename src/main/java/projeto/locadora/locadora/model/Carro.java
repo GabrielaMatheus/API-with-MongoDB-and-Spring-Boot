@@ -1,11 +1,15 @@
 package projeto.locadora.locadora.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Carro {
 
     @Id
@@ -17,16 +21,4 @@ public class Carro {
     private long ano;
     private String cor;
     private Double valor;
-
-    public Carro(String id, String placa, String marca, String modelo, Long ano, String cor, Double valor) {
-        this.placa = placa;
-        this.id = id;
-        this.marca = marca;
-        this.modelo = modelo;
-        this.ano = ano;
-        this.cor = cor;
-        this.valor = valor;
-    }
-
-    public Carro() {}
 }

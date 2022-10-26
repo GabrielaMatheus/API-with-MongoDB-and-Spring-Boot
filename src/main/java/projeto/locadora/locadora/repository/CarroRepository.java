@@ -10,4 +10,6 @@ public interface CarroRepository extends MongoRepository<Carro, String> {
     Carro getReferenceById(String id);
 
     Optional<Carro> findByPlaca(String placa);
+
+    Optional<Carro> findById(String id);
 }

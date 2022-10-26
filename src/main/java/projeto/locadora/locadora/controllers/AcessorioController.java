@@ -38,14 +38,14 @@ public class AcessorioController {
         acessorioService.persistir(form);
     }
 
-    @PutMapping
-    public Acessorio atualizar(@RequestBody @Valid AcessorioForm form) throws NotFoundException {
-        acessorioService.atualizar(form);
-        return listarUm(form.getDoc());
+    @PutMapping("/{id}")
+    public Acessorio atualizar(@RequestBody @Valid AcessorioForm form, @PathVariable String id)
+        throws NotFoundException {
+        acessorioService.atualizar(form, id);
+        return listarUm(id);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     public void remover(@PathVariable String id) throws NotFoundException {
         acessorioService.remover(id);
     }

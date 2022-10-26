@@ -28,25 +28,30 @@ public class CarroController {
 
     @GetMapping
     public Page<Carro> listar(
-        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 5) Pageable paginacao
+        @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 50) Pageable paginacao
     ) {
         return carroService.listar(paginacao);
     }
 
-    @GetMapping("/{placa}")
-    public Carro listarUm(@PathVariable String placa) throws NotFoundException {
-        return carroService.listarUm(placa);
+    @GetMapping("/{id}")
+    public Carro listarUm(@PathVariable String id) throws NotFoundException {
+        return carroService.listarUm(id);
     }
+
+    //    @GetMapping("/{id}")
+    //    public Carro getById(@PathVariable String id) throws NotFoundException {
+    //        return carroService.getById(id);
+    //    }
 
     @PostMapping
     public void persistir(@RequestBody @Valid CarroForm form) throws NotFoundException {
         carroService.persistir(form);
     }
 
-    @PutMapping
-    public Carro atualizar(@RequestBody @Valid CarroForm form) throws NotFoundException {
-        carroService.atualizar(form);
-        return listarUm(form.getPlaca());
+    @PutMapping("/{id}")
+    public Carro atualizar(@RequestBody @Valid CarroForm form, @PathVariable String id) throws NotFoundException {
+        carroService.atualizar(form, id);
+        return listarUm(id);
     }
 
     @DeleteMapping("/{id}")
