@@ -1,6 +1,9 @@
 package projeto.locadora.locadora.service;
 
+import java.util.Map;
 import java.util.Optional;
+
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +31,20 @@ public class CarroService {
         return carroRepository.findById(id).orElseThrow(() -> new NotFoundException("Placa não encontrada"));
     }
 
-    public void persistir(CarroForm form) throws NotFoundException {
+    public Carro listarPelaPlaca(String placa) throws NotFoundException {
+        return carroRepository.findByPlaca(placa).orElseThrow(() -> new NotFoundException("Placa não encontrada"));
+
+    }
+
+    public Map<String, String> persistir(CarroForm form) throws NotFoundException {
         Optional<Carro> carro = carroRepository.findByPlaca(form.getPlaca());
         if (carro.isPresent()) {
             throw new NotFoundException("Placa já cadastrada.");
         }
-        carroRepository.save(CarroMapper.INSTANCE.carroFormToCarro(form));
+        Carro carroSalvo = carroRepository.save(CarroMapper.INSTANCE.carroFormToCarro(form));
+        return  Map.of("id", carroSalvo.getId());
+
+
     }
 
     public void atualizar(CarroForm form, String id) throws NotFoundException {

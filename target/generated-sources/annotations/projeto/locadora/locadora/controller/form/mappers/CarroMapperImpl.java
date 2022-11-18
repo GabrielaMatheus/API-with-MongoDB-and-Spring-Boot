@@ -6,8 +6,8 @@ import projeto.locadora.locadora.model.Carro;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-10-26T14:53:43-0300",
-    comments = "version: 1.5.2.Final, compiler: javac, environment: Java 18.0.2.1 (Oracle Corporation)"
+    date = "2022-11-16T14:23:29-0300",
+    comments = "version: 1.5.2.Final, compiler: javac, environment: Java 18.0.1.1 (Oracle Corporation)"
 )
 public class CarroMapperImpl implements CarroMapper {
 

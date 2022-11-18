@@ -1,5 +1,6 @@
 package projeto.locadora.locadora.controllers;
 
+import java.util.Map;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.AcessorioForm;
 import projeto.locadora.locadora.model.Acessorio;
+import projeto.locadora.locadora.model.Carro;
 import projeto.locadora.locadora.service.AcessorioService;
 
 @RestController
@@ -33,9 +35,14 @@ public class AcessorioController {
         return acessorioService.listarUm(doc);
     }
 
+    @GetMapping("/filtrar/{doc}")
+    public Acessorio listarPeloDoc(@PathVariable String doc) throws NotFoundException {
+        return acessorioService.listarPeloDoc(doc);
+    }
+
     @PostMapping
-    public void persistir(@RequestBody @Valid AcessorioForm form) throws NotFoundException {
-        acessorioService.persistir(form);
+    public Map<String,String> persistir(@RequestBody @Valid AcessorioForm form) throws NotFoundException {
+        return acessorioService.persistir(form);
     }
 
     @PutMapping("/{id}")

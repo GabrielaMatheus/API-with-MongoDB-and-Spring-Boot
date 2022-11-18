@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import projeto.locadora.locadora.config.validation.exceptions.NotFoundException;
 import projeto.locadora.locadora.controller.form.CarroForm;
+import projeto.locadora.locadora.controller.form.ListarCarrosForm;
 import projeto.locadora.locadora.model.Carro;
 import projeto.locadora.locadora.service.CarroService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/carros")
@@ -35,17 +38,19 @@ public class CarroController {
 
     @GetMapping("/{id}")
     public Carro listarUm(@PathVariable String id) throws NotFoundException {
-        return carroService.listarUm(id);
+            return carroService.listarUm(id);
+
     }
 
-    //    @GetMapping("/{id}")
-    //    public Carro getById(@PathVariable String id) throws NotFoundException {
-    //        return carroService.getById(id);
-    //    }
+    @GetMapping("/filtrar/{placa}")
+    public Carro listarPelaPlaca(@PathVariable String placa) throws NotFoundException {
+        return carroService.listarPelaPlaca(placa);
+    }
+
 
     @PostMapping
-    public void persistir(@RequestBody @Valid CarroForm form) throws NotFoundException {
-        carroService.persistir(form);
+    public Map<String,String> persistir(@RequestBody @Valid CarroForm form) throws NotFoundException {
+        return carroService.persistir(form);
     }
 
     @PutMapping("/{id}")

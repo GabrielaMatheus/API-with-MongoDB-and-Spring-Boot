@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo
+    container_name: mongo-container
+    networks:
+      - compose-bridge
+    ports:
+      - 27017:27017
+
+  locadora-application:
+    build: ./locadora-application/
+    container_name: locadora-container
+    networks:
+      - compose-bridge
+    ports:
+      - 8080:8080
+
+
+networks:
+  compose-bridge:
+    driver: bridge

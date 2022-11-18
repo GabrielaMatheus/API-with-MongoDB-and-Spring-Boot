@@ -8,8 +8,8 @@ import projeto.locadora.locadora.model.Aluguel;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-10-26T14:53:42-0300",
-    comments = "version: 1.5.2.Final, compiler: javac, environment: Java 18.0.2.1 (Oracle Corporation)"
+    date = "2022-11-16T14:23:28-0300",
+    comments = "version: 1.5.2.Final, compiler: javac, environment: Java 18.0.1.1 (Oracle Corporation)"
 )
 public class AluguelMapperImpl implements AluguelMapper {
 

@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import projeto.locadora.locadora.controller.form.AcessorioForm;
 
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(MongoDBConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -20,7 +22,7 @@ import projeto.locadora.locadora.controller.form.AcessorioForm;
 public class AcessorioControllerTest {
 
     public String pegaIdAcessorio(String docParam) {
-        return given().contentType(ContentType.JSON).when().get("/acessorios/" + docParam).then().extract().path("id");
+        return given().contentType(ContentType.JSON).when().get("/acessorios/filtrar/" + docParam).then().extract().path("id");
     }
 
     //POST
@@ -99,7 +101,7 @@ public class AcessorioControllerTest {
         given()
             .contentType(ContentType.JSON)
             .when()
-            .get("/acessorios/numDoc4987")
+            .get("/acessorios/"+ pegaIdAcessorio("numDoc4987"))
             .then()
             .log()
             .all()
@@ -129,7 +131,7 @@ public class AcessorioControllerTest {
 
     @Order(7)
     @org.junit.jupiter.api.Test
-    public void givenNoRequiredFieldDoc_WhenPut_Then400() throws Exception {
+    public void givenNoRequiredFieldDoc_WhenPut_Then405() throws Exception {
         AcessorioForm acessorioForm = new AcessorioForm();
         acessorioForm.setNome("acessorio teste");
         acessorioForm.setValor(56.00);
@@ -143,16 +145,13 @@ public class AcessorioControllerTest {
             .log()
             .all()
             .assertThat()
-            .statusCode(400)
-            .body("campo", hasItems("doc"))
-            .body("erro", hasItems("não deve estar em branco"));
+            .statusCode(405);
     }
 
     @Order(8)
     @org.junit.jupiter.api.Test
     public void givenWrongId_whenPut_then400() throws Exception {
         AcessorioForm acessorioForm = new AcessorioForm();
-        acessorioForm.setId("wrongId111222333");
         acessorioForm.setDoc("numDoc4987");
         acessorioForm.setNome("acessorio teste");
         acessorioForm.setValor(89.90);
@@ -161,7 +160,7 @@ public class AcessorioControllerTest {
             .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
-            .put("/acessorios")
+            .put("/acessorios/" + pegaIdAcessorio("wrongId111222333"))
             .then()
             .log()
             .all()
@@ -174,7 +173,6 @@ public class AcessorioControllerTest {
     @org.junit.jupiter.api.Test
     public void givenDataWithRequiredField_WhenPut_Then200() throws Exception {
         AcessorioForm acessorioForm = new AcessorioForm();
-        acessorioForm.setId(pegaIdAcessorio("numDoc4987"));
         acessorioForm.setDoc("numDoc4987845");
         acessorioForm.setNome("teste atualizado");
         acessorioForm.setValor(2.6);
@@ -183,7 +181,7 @@ public class AcessorioControllerTest {
             .body(acessorioForm)
             .contentType(ContentType.JSON)
             .when()
-            .put("/acessorios")
+            .put("/acessorios/"+pegaIdAcessorio("numDoc4987"))
             .then()
             .log()
             .all()
